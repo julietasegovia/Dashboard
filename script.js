@@ -6,8 +6,8 @@ function loadDate(){
 
 function loadWeather() {
     var weather = $('#weather')
-    var url = 'api.openweathermap.org/data/2.5/weather'
-    var apiKey = 'YOUR API KEY'
+    var url = 'https://api.openweathermap.org/data/2.5/weather'
+    var apiKey = WEATHER_API_KEY
 
     function success(position) {
         var latitude = position.coords.latitude 
@@ -15,7 +15,7 @@ function loadWeather() {
 
         $.getJSON(
             url +
-                '?units=si&lat=' +
+                '?units=metric&lat=' +
                 latitude +
                 '&lon=' +
                 longitude +
@@ -23,7 +23,7 @@ function loadWeather() {
                 apiKey,
         function (data) {
             weather.text(
-            'It is ' + main.temp + '°C right now'
+            'It is ' + data.main.temp + '°C right now'
             )
         }
     )}
@@ -41,7 +41,7 @@ function loadWeather() {
 function loadNews() {
     var news = $('#news')
     var url = 'https://newsapi.org/v2/top-headlines?sources=the-next-web&apiKey='
-    var apiKey = 'YOUR API KEY'
+    var apiKey = NEWS_API_KEY
 
     $.getJSON(url + apiKey, function (data) {
         var titles = data.articles.map(function (articles) {
