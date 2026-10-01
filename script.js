@@ -1,6 +1,6 @@
 function loadDate(){
     var currentDate = new Date()
-    var dateDtring = currentDate.toString().split(' ').splice(0, 4).join(' ')
+    var dateString = currentDate.toString().split(' ').splice(0, 4).join(' ')
     $('#date').text(dateString)
 }
 
