@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import RootLayout from './layout.jsx'
+import Page from './page.jsx'
 
 function formatDate(date) {
   return date.toString().split(' ').slice(0, 4).join(' ')
@@ -69,7 +71,8 @@ export default function App() {
   }, [])
 
   return (
-    <>
+    <RootLayout>
+      <Page />
       <h1>
         Hello! Today is <span>{dateLabel}</span>
       </h1>
@@ -93,6 +96,6 @@ export default function App() {
         Powered by <a href="https://newsapi.org/">NewsAPI</a> and{' '}
         <a href="https://openweathermap.org/">OpenWeatherMap</a>
       </p>
-    </>
+    </RootLayout>
   )
 }

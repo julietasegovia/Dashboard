@@ -1,16 +1,12 @@
-export const viewport: Viewport = {
-    colorScheme: 'light dark',
-    themeColor: [
-        {media: '(prefers-color-scheme: light)', color:'white'},
-        {media: '(prefers-color-scheme: dark)', color:'black'},
-    ],
+export const viewport = {
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
+  ],
 }
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+ 
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="bg-[#edf5ff] font-sans text-[#173b63] antialiased">
@@ -20,3 +16,4 @@ export default function RootLayout({
     </html>
   )
 }
+ 
