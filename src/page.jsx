@@ -116,7 +116,35 @@ export default function Page(){
                         {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => <span key={i}>{d}</span>)}
                     </div>
                 </article>
-            </section>
+
+                <article className={`${panel} col-[2/4] min-h-[170px] max-[850px]:col-[1/3] max-[560px]:col-auto`}>
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className={kicker}>Device Pulse</p>
+                            <h2 className={heading}>Under the hood.</h2>
+                        </div>
+                    </div>
+                    <div className="mt-[27px] grid grid-cols-2 gap-[30px] max-[560px]:grid-cols-1 max-[560px]:gap-5">
+                        <div className="flex items-center gap-[15px]">
+                            <div className="relative grid size-[43px] place-items-center rounded-[13px] bg-[#dff0fc] text-[22px] text-[#4b96c5] after:absolute after:top-[17px] after:-right-1 after:h-2.5 after:w-1 after:rounded-r-sm after:bg-[#9eb1a0] after:content-['']">
+                                <span className="relative h-3 w-[21px] rounded-sm border-2 border-[#8ba18d] after:absoulte after:inset-y-0.5 after:right-1 after:left-0.5 after:bg-[#8ba18d] after:content-['']"></span>
+                            </div>
+                            <div>
+                                <small className="text-[9px] tracking-[.13em] text-[#6f9b5]">Battery</small>
+                                <strong className="my-1 block text-[28px] font-semibold text-[#245e8e]">78<span className="text-[17px] text-[#6d9abe]">%</span></strong>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-[15px]">
+                        <div className="grid size-[43px] place-items-center rounded-[13px] bg-[#dff0fc] text-[22px] text-[#4b96c5]">◒</div>
+                        <div>
+                            <small className="text-[9px] tracking-[.13em] text-[#6f96b5]">CPU TEMPERATURE</small>
+                            <strong className="my-1 block text-[28px] font-semibold text-[#245e8e]">54<span className="text-[17px] text-[#6d9abe]">°C</span></strong>
+                            <p className="text-[10px] text-[#7e9fba]">Running comfortably</p>
+                        </div>
+                        </div>
+                    </div>
+                    </article>
+                </section>
         </main>
     )
 }
