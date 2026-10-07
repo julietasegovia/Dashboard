@@ -35,8 +35,65 @@ export default function Page(){
                     <a href="#activity">Activity</a>
                     <a href="#settings">Settings</a>
                 </nav>
-                <div></div>
             </header>
+
+            <section id="overview" className={`${wrap} flex items-end justify-between pt-[66px] pb-[42px] max-[850px]:flex-col max-[850px]:items-start max-[850px]:gap-6 max-[850px]:pt-[58px] max-[850px]:pb-[38px]`}>
+                <div>
+                    <p className={kicker}> WEDNESDAY, OCTOBER 07, 2026 <span className="mx-[5px] text-[#4da2d7]">·</span> 10:40 AM</p>
+                    <h1 className="mt-[17px] mb-3.5 text-[clamp(43px,5vw,68px)] leading-[.98] font-[650] tracking-[-.055em] text-[#174b7a] max-[560px]:text-[46px]">
+                        Snowboard, <em className="text-[#3b91cb] not-italict">slide through your stats.</em></h1>
+                </div>
+            </section>
+
+            <section aria-label="Dashboard" className={`${wrap} grid grid-cols-[1.02fr_1fr_1fr] items-stretch gap-[19px] max-[850px]:grid-cols-2 max-[560px]:grid-cols-1`}>
+                <Snowglobe>
+                    <Sparkle className="top-[70px] right-7 text-[11px]"></Sparkle>
+                    <Sparkle className="top-[132px] left-[30px] text-[8px]"></Sparkle>
+                    <div className="absolute right-1/2 bottom-[42px] h-[82px] w-[145px] origin-bottom translate-x-1/2 scale-[.85] rounded-[58%_58%_40%_40%] bg-[#aed6ef] opacity-75">
+                        <span className="absolute -top-[43px] right-[22px] text-[97px] text-[#76b9e6] opacity-85">☼</span>
+                        <span className="absolute bottom-[15px] h-[26px] w-20 rounded-[30px] bg-[#d4ecfb] shadow-[20px_-10px_0_-4px_#d4ecfb,45px_0_0_-5px_#d4ecfb]"></span>
+                        <span className="absolute bottom-[37px] -left-[39px] h-[26px] w-20 scale-[.55] rounded-[30px] bg-[#d4ecfb] shadow-[20px_-10px_0_-4px_#d4ecfb,45px_0_0_-5px_#d4ecfb]"></span>
+                    </div>
+                    <div className="absolute inset-x-5 top-[34px] z-[2] text-center max-[560px]:inset-x-4 max-[560px]:top-[30px]">
+                        <p className="mt-4 text-[58px] leading-none font-[650] tracking-[-0.5rem] text-[#1a5687]">Today&apos;s Weather</p>
+                        <div className="mt-4 text-[58px] leading-none font-[650] tracking-[-.05em] text-[#1a5687]">
+                        12<span className="align-top text-[19px] tracking-normal text-[#5a91b7]">°C</span>
+                        </div>
+                        <p className="mt-3 text-xs leading-[1.6] text-[#5f8aae]">
+                        Clear skies with a gentle<br />breeze throughout the day.
+                        </p>
+                        <div className="mt-[22px] flex justify-center gap-3.5 text-[10px] text-[#6e9abc]">
+                            <span><b className="font-semibold text-[#3978a7]">18°</b> high</span>
+                            <span><b className="font-semibold text-[#3978a7]">7°</b> low</span>
+                            <span><b className="font-semibold text-[#3978a7]">42%</b> humidity</span>
+                        </div>
+                    </div>
+                </Snowglobe>
+
+                <article className={`${panel} min-h-[295px]`}>
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className={kicker}>The daily drift</p>
+                            <h2 className={heading}>What's going on?</h2>
+                        </div>
+                        <button className="cursor-pointer tracking-[3px]  text-[#6b9ac0]" aria-label="More news">...</button>
+                    </div>
+                    <div className="mt-[23px] flex flex-col">
+                        {headlines.map((h, i) => (
+                            <a key={h.titlr} href={`#story-${i+1}`} className="grid grid-cols-[22px_1fr_16px] gap-2.5 border-t border-[#dcebf6] py-3.5">
+                                <span className="text-[13px] text-[#4d98cb]">0{i + 1}</span>
+                                <span>
+                                    <small className="mb-[5px] block text-[9px] tracking-[.13em] text-[#6e96b6]">{h.category}</small>
+                                    <strong className="block text-sm leading-[1.3] font-medium text-[#315f87]">{h.title}</strong>
+                                    <small className="mt-1.5 block text-[9px] text-[#88a9c2]">{h.time}</small>
+                                </span>
+                                <span className="text-[15px] text-[#5298c7]">↗</span>
+                            </a>
+                        ))}
+                    </div>
+                </article>
+                
+            </section>
         </main>
     )
 }
