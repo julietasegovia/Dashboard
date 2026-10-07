@@ -92,7 +92,30 @@ export default function Page(){
                         ))}
                     </div>
                 </article>
-                
+
+                <article id="activity" className={`${panel} min-h-[295px]`}>
+                    <div>
+                        <div>
+                            <p className={kicker}>This week</p>
+                            <h2 className={heading}>Time you locked in</h2>
+                        </div>
+                        <span className="text-[9px] font-bold tracking-[.12em] text-[#3789be]">+18%</span>
+                    </div>
+                    <div className="mt-[29px] mb-[22px] flex items-baseline justify-between">
+                        <strong className="text-[39px] font-semibold tracking-[-.04em] text-[#1c5888]">
+                            24<span className="text-[17px] text-[#6d9abe]">h</span> 38<span className="text-[17px] text-[#6d9abe]">m</span>
+                        </strong>
+                        <span className="text-[10px] text-[#7c9fbb]">coding time</span>
+                    </div>
+                    <div aria-label="coding hours by day" className="flex h-[110px] items-end gap-2.5 border-b border-[#d6e9f6]">
+                        {barHeights.map((h, i) => (
+                            <span key={i} style={{height: `${h}%`}} className={`min-h-2.5 flex-1 rounded-t-md opacity-90 ${i === 3 ? 'bg-[#5ca8d8]' : 'bg-linear-to-b from-[#77b8e2] to-[#408bc0]'}`}></span>
+                        ))}
+                    </div>
+                    <div className="mt-[9px] flex justify-between text-[10px] text-[#7e9fba]">
+                        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => <span key={i}>{d}</span>)}
+                    </div>
+                </article>
             </section>
         </main>
     )
