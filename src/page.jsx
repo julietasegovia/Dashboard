@@ -1,3 +1,6 @@
+import { useEffect, useMemo, useState } from "react"
+import Particles, {initParticlesEngine} from "@tsparticles/react"
+import {loadSlim} from '@tsparticles/slim'
 //placeholders
 const headlines = [
     {category: 'ONE', title: 'news 1'},
@@ -14,12 +17,15 @@ const heading = 'mt-[9px] text-[23px] font-semibold text-[#1d4e7c]'
 
 function Snowglobe({children, className=''}) {
     return (
-        <div className={`relative min-h-[330px] overflow-hidden shadow-[0_14px_34px_rgba(52,105,151,.09)] max-[850px]:min-h[300px] ${className}`}>
-            <div className="absolute inset-x-0 top-0 bottom-[25px] overflow-hidden rounded-full border-white/95 bg-[radial-gradient(circle_at_50%_18%,#fafdff_0,#dff1ff_48%,#b9dcf4_100%)] shadow-[inset_0_0_34px_rgba(255,255,255,.85),0_12px_24px_rgba(47,113,164,.13)]">
+        <div className={`@container relative mx-auto aspect-square w-full max-w-[420px] self-center justify-self-center ${className}`}>
+            <div className="absolute top-0 left-1/2 aspect-square h-[calc(100%-28px)] -translate-x-1/2 overflow-hidden rounded-full border border-white/95 bg-[radial-gradient(circle_at_50%_18%,#fafdff_0,#dff1ff_48%,#b9dcf4_100%)] shadow-[inset_0_0_40px_rgba(255,255,255,.85),0_12px_24px_rgba(47,113,164,.13)]">
                 {children}
             </div>
-            <div className="absolute inset-x-[7%] bottom-5 h-12 rounded-t bg-linear-to-b from-[#78b2d9] to-[#3f7eaf] [clip-path:polygon(10%_0,90%_0,100%_100%,0_100%)]"/>
-            <span aria-hidden="true" className="absolute top-[69px] left-1/4 z-[1] size-1 rounded-full bg-white opacity-80 shadow-[35px_42px_#fff,120px_25px_#fff,195px_72px_#fff,155px_126px_#fff,60px_140px_#fff]"></span>
+            <div className="absolute inset-x-[12%] bottom-0 h-14 rounded-t bg-linear-to-b from-[#78b2d9] to-[#3f7eaf] [clip-path:polygon(10%_0,90%_0,100%_100%,0_100%)]" />
+            <span
+                aria-hidden="true"
+                className="absolute top-[18%] left-1/4 z-[1] size-1 rounded-full bg-white opacity-80 shadow-[35px_42px_#fff,120px_25px_#fff,195px_72px_#fff,155px_126px_#fff,60px_140px_#fff]"
+            />
         </div>
     )
 }
@@ -57,7 +63,7 @@ export default function Page(){
                 </div>
             </section>
 
-            <section aria-label="Dashboard" className={`${wrap} grid grid-cols-[1.02fr_1fr_1fr] items-stretch gap-[19px] max-[850px]:grid-cols-2 max-[560px]:grid-cols-1`}>
+            <section aria-label="Dashboard" className={`${wrap} grid! mx-auto max-w-[720px] grid-cols-1 justify-items-center gap-8`}>
                 <Snowglobe>
                     <Sparkle className="top-[70px] right-7 text-[11px]"></Sparkle>
                     <Sparkle className="top-[132px] left-[30px] text-[8px]"></Sparkle>
@@ -67,7 +73,7 @@ export default function Page(){
                         <span className="absolute bottom-[37px] -left-[39px] h-[26px] w-20 scale-[.55] rounded-[30px] bg-[#d4ecfb] shadow-[20px_-10px_0_-4px_#d4ecfb,45px_0_0_-5px_#d4ecfb]"></span>
                     </div>
                     <div className="absolute inset-x-5 top-[34px] z-[2] text-center max-[560px]:inset-x-4 max-[560px]:top-[30px]">
-                        <p className="mt-4 text-[58px] leading-none font-[650] tracking-[-0.5rem] text-[#1a5687]">Today&apos;s Weather</p>
+                        <p className="mt-4 text-[58px] leading-none font-[650] tracking-[-0.5rem] text-[#1a5687]">The Weather</p>
                         <div className="mt-4 text-[58px] leading-none font-[650] tracking-[-.05em] text-[#1a5687]">
                         12<span className="align-top text-[19px] tracking-normal text-[#5a91b7]">°C</span>
                         </div>
@@ -82,7 +88,8 @@ export default function Page(){
                     </div>
                 </Snowglobe>
 
-                <article className={`${panel} min-h-[295px]`}>
+                <div className="mx-auto grid w-full max-w-[720px] grid-cols-2 items-stretch gap-x-0 gap-y-[19px] max-[560px]:grid-cols-1">
+                    <article className={`${panel} h-full min-h-[295px] min-[561px]:rounded-r-none! min-[561px]:border-r-0`}>
                     <div className="flex items-start justify-between">
                         <div>
                             <p className={kicker}>The daily drift</p>
@@ -105,8 +112,8 @@ export default function Page(){
                     </div>
                 </article>
 
-                <article id="activity" className={`${panel} min-h-[295px]`}>
-                    <div>
+                <article id="activity" className={`${panel} h-full min-h-[295px] min-[561px]:rounded-l-none!`}>                    
+                    <div className="flex items-start justify-between">
                         <div>
                             <p className={kicker}>This week</p>
                             <h2 className={heading}>Time you locked in</h2>
@@ -129,7 +136,7 @@ export default function Page(){
                     </div>
                 </article>
 
-                <article className={`${panel} col-[2/4] min-h-[170px] max-[850px]:col-[1/3] max-[560px]:col-auto`}>
+                <article className={`${panel} col-span-2 min-h-[170px] max-[560px]:col-span-1`}>
                     <div className="flex items-start justify-between">
                         <div>
                             <p className={kicker}>Device Pulse</p>
@@ -156,7 +163,8 @@ export default function Page(){
                         </div>
                     </div>
                     </article>
-                </section>
+                </div>
+            </section>
         </main>
     )
 }
