@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import Particles, { ParticlesProvider } from "@tsparticles/react"
 import { loadSlim } from "@tsparticles/slim"
 import {useApi} from  './services/useApi.js'
@@ -75,6 +75,21 @@ function Sparkle({className=''}){
 }
 
 export default function Page(){
+    const weather = useApi('/api/weather', {refreshMs: 10 * 60_000}).data
+    const news = useApi('/api/news', {refreshMs: 15 * 60_000}).data
+    const coding = useApi('/api/coding', {refreshMs: 15 * 60_000}).data
+    const device = useApi('/api/device', {refreshMs: 30_000}).data
+    const stories = news?.headlines ?? headlines
+    const bars = coding?.bars ?? barHeights
+    const labels = coding?.labels ?? ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+
+    useEffect(() => {
+        // #region agent log
+        fetch('http://127.0.0.1:7632/ingest/b1d0acd6-3679-4484-bbc0-9e5a4f5aecd2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'7f0471'},body:JSON.stringify({sessionId:'7f0471',runId:'pre-fix',hypothesisId:'E',location:'page.jsx:Page',message:'dashboard render sources',data:{weatherTemp:weather?.temp??null,newsCount:news?.headlines?.length??null,storiesCount:stories.length,mappedList:'headlines-constant',codingHours:coding?.hours??null,codingMinutes:coding?.minutes??null,displayedTime:'24h 38m',deviceBattery:device?.battery??null,deviceCpu:device?.cpuTemp??null},timestamp:Date.now()})}).catch(()=>{});
+        fetch('http://127.0.0.1:7632/ingest/b1d0acd6-3679-4484-bbc0-9e5a4f5aecd2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'7f0471'},body:JSON.stringify({sessionId:'7f0471',runId:'post-fix',hypothesisId:'E',location:'page.jsx:Page',message:'rendered values',data:{usingLiveNews:stories!==headlines,titles:stories.map((h)=>h.title),hours:coding?.hours??null,minutes:coding?.minutes??null,weatherTemp:weather?.temp??null,battery:device?.battery??null,cpu:device?.cpuTemp??null},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+    }, [weather, news, coding, device, stories.length])
+
     return(
         <main className="relative min-h-screen overflow-hidden bg-[#edf5ff] px-[clapm(24px,5vw,78px)] pt-6 pb-6 max-[560px]:px-[17px] max-[560px]:py-5">
             <section aria-label="Dashboard" className={`${wrap} grid! mx-auto max-w-[960px] grid-cols-1 justify-items-center gap-8`}>
@@ -89,12 +104,12 @@ export default function Page(){
                     <div className="absolute inset-x-5 top-[34px] z-[2] text-center max-[560px]:inset-x-4 max-[560px]:top-[30px]">
                         <p className="mt-4 text-[58px] leading-none font-[650] tracking-[-0.5rem] text-[#1a5687]">The Weather</p>
                         <div className="mt-4 text-[58px] leading-none font-[650] tracking-[-.05em] text-[#1a5687]">
-                        12<span className="align-top text-[19px] tracking-normal text-[#5a91b7]">°C</span>
+                        {weather?.temp ?? '--'}<span className="align-top text-[19px] tracking-normal text-[#5a91b7]">°C</span>
                         </div>
                         <div className="mt-[22px] flex justify-center gap-3.5 text-[10px] text-[#6e9abc]">
-                            <span><b className="font-semibold text-[#3978a7]">18°</b> high</span>
-                            <span><b className="font-semibold text-[#3978a7]">7°</b> low</span>
-                            <span><b className="font-semibold text-[#3978a7]">42%</b> humidity</span>
+                            <span><b className="font-semibold text-[#3978a7]">{weather?.high ?? '--'}°</b> high</span>
+                            <span><b className="font-semibold text-[#3978a7]">{weather?.low ?? '--'}°</b> low</span>
+                            <span><b className="font-semibold text-[#3978a7]">{weather?.humidity ?? '--'}</b> humidity</span>
                         </div>
                     </div>
                 </Snowglobe>
@@ -108,13 +123,11 @@ export default function Page(){
                         <button className="cursor-pointer tracking-[3px]  text-[#6b9ac0]" aria-label="More news">...</button>
                     </div>
                     <div className="mt-[23px] flex flex-col">
-                        {headlines.map((h, i) => (
-                            <a key={h.titlr} href={`#story-${i+1}`} className="grid grid-cols-[22px_1fr_16px] gap-2.5 border-t border-[#dcebf6] py-3.5">
-                                <span>
-                                    <small className="mb-[5px] block text-[9px] tracking-[.13em] text-[#6e96b6]">{h.category}</small>
-                                    <strong className="block text-sm leading-[1.3] font-medium text-[#315f87]">{h.title}</strong>
-                                    <small className="mt-1.5 block text-[9px] text-[#88a9c2]">{h.time}</small>
-                                </span>
+                        {stories.map((h, i) => (
+                            <a key={h.title} href={h.url ?? `#story-${i + 1}`} target={h.url ? '_blank' : undefined} rel="noreferrer" className="group block border-[#dcebf6] py-3.5">
+                                <strong className="line-clamp-2 block text-sm leading-[1.3] font-medium text-[#315f87] group-hover:text-[#7fb1d8]">
+                                    {h.title}
+                                </strong>
                             </a>
                         ))}
                     </div>
@@ -128,16 +141,16 @@ export default function Page(){
                     </div>
                     <div className="mt-[29px] mb-[22px] flex items-baseline justify-between">
                         <strong className="text-[39px] font-semibold tracking-[-.04em] text-[#1c5888]">
-                            24<span className="text-[17px] text-[#6d9abe]">h</span> 38<span className="text-[17px] text-[#6d9abe]">m</span>
+                            {coding?.hours ?? '--'}<span className="text-[17px] text-[#6d9abe]">h</span> {coding?.minutes ?? '--'}<span className="text-[17px] text-[#6d9abe]">m</span>
                         </strong>
                     </div>
                     <div aria-label="coding hours by day" className="flex h-[110px] items-end gap-2.5 border-b border-[#d6e9f6]">
-                        {barHeights.map((h, i) => (
+                        {bars.map((h, i) => (
                             <span key={i} style={{height: `${h}%`}} className={`min-h-2.5 flex-1 rounded-t-md opacity-90 ${i === 3 ? 'bg-[#5ca8d8]' : 'bg-[#68add6]'}`}></span>
                         ))}
                     </div>
                     <div className="mt-[9px] flex justify-between text-[10px] text-[#7e9fba]">
-                        {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => <span key={i}>{d}</span>)}
+                        {labels.map((d, i) => <span key={i}>{d}</span>)}
                     </div>
                 </article>
 
@@ -154,14 +167,14 @@ export default function Page(){
                             </div>
                             <div>
                                 <small className="text-[9px] tracking-[.13em] text-[#6f9b5]">Battery</small>
-                                <strong className="my-1 block text-[28px] font-semibold text-[#245e8e]">78<span className="text-[17px] text-[#6d9abe]">%</span></strong>
+                                <strong className="my-1 block text-[28px] font-semibold text-[#245e8e]">{device?.battery ?? '--'}<span className="text-[17px] text-[#6d9abe]">%</span></strong>
                             </div>
                         </div>
                         <div className="flex items-center gap-[15px]">
                         <div className="grid size-[43px] place-items-center rounded-[13px] bg-[#dff0fc] text-[22px] text-[#4b96c5]">◒</div>
                         <div>
                             <small className="text-[9px] tracking-[.13em] text-[#6f96b5]">CPU temp</small>
-                            <strong className="my-1 block text-[28px] font-semibold text-[#245e8e]">54<span className="text-[17px] text-[#6d9abe]">°C</span></strong>
+                            <strong className="my-1 block text-[28px] font-semibold text-[#245e8e]">{device?.cpuTemp ?? '--'}<span className="text-[17px] text-[#6d9abe]">°C</span></strong>
                         </div>
                         </div>
                     </div>
