@@ -1,6 +1,44 @@
-import { useEffect, useMemo, useState } from "react"
-import Particles, {initParticlesEngine} from "@tsparticles/react"
-import {loadSlim} from '@tsparticles/slim'
+import { useMemo } from "react"
+import Particles, { ParticlesProvider } from "@tsparticles/react"
+import { loadSlim } from "@tsparticles/slim"
+
+function initSnow(engine) {
+    return loadSlim(engine)
+}
+
+function SnowParticles(){
+    const options = useMemo(() => {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        return {
+            fullScreen: {enable:false},
+            background: {color: {value: 'transparent'}},
+            fpsLimit: 60,
+            detectRetina: true,
+            particles: {
+                number:{value: 60, desnity: {enable: true, width: 400,height: 400}},
+                color: {value: '#ffffff'},
+                shape: {type: 'triangle'},
+                opacity: {value: {min: 0.45, max: 0.95}},
+                size: {value: {min: 1.5, max: 4.5}},
+                move: {
+                    enable: !reduceMotion,
+                    direction: 'bottom',
+                    speed: {min: 0.4, max: 1.4},
+                    straight: false,
+                    drift: {min: -0.6, max: 0.6},
+                    outModes: {default: 'out'},
+                },
+            },
+        }
+    }, [])
+
+    return (
+        <ParticlesProvider init={initSnow}>
+            <Particles id="snowglobe-snow" options={options} className="pointer-events-none absolute inset-0 z-[1]"/>
+        </ParticlesProvider>
+    )
+}
+
 //placeholders
 const headlines = [
     {category: 'ONE', title: 'news 1'},
@@ -19,6 +57,7 @@ function Snowglobe({children, className=''}) {
     return (
         <div className={`@container relative mx-auto aspect-square w-full max-w-[420px] self-center justify-self-center ${className}`}>
             <div className="absolute top-0 left-1/2 aspect-square h-[calc(100%-28px)] -translate-x-1/2 overflow-hidden rounded-full border border-white/95 bg-[radial-gradient(circle_at_50%_18%,#fafdff_0,#dff1ff_48%,#b9dcf4_100%)] shadow-[inset_0_0_40px_rgba(255,255,255,.85),0_12px_24px_rgba(47,113,164,.13)]">
+                <SnowParticles/>
                 {children}
             </div>
             <div className="absolute inset-x-[12%] bottom-0 h-14 rounded-t bg-linear-to-b from-[#78b2d9] to-[#3f7eaf] [clip-path:polygon(10%_0,90%_0,100%_100%,0_100%)]" />
@@ -43,17 +82,6 @@ export default function Page(){
         <main className="relative min-h-screen overflow-hidden bg-[#edf5ff] bg-[radial-gradient(circle_at_78%_0%,#fff_0,transparent_34%)] px-[clapm(24px,5vw,78px)] pt-6 pb-6 max-[560px]:px-[17px] max-[560px]:py-5">
             <div className="pointer-events-none absolute -right-[90px] top-[210px] size-[260px] rounded-full bg-[#c8e4ff] opacity-65 blur-[1px]"></div>
             <div className="pointer-events-none absolute -left-20 bottom-10 size-[180px] rounded-full bg-[#d9edff] opacity-80 blur-[1px]"></div>
-        
-            <header className={`${wrap} flex items-center justify-between`}>
-                <div className="flex items-center gap-2.5 text-[11px] font-bold tracking-[.18rem] text-[#215b91]">
-                    <span className="relative size-[22px] rounded-full border-[1.5px] border-[#4d91c9] after:absolute after:top-[7px] after:left-[7px] after:size-[5px] after:rounded-full after:bg-[#76b9ed] after:content-['']">Snowboard</span>
-                </div>
-                <nav aria-label="main navigator" className="flex gap-[34px] text-xs text-[#7d9dbd] max-[850px]:hidden">
-                    <a href="#overview" className="text-[#1f6099] after:mx-auto after:mt-[7px] after:block after:size-1 after:rounded-full after:bg-[#4c9bd2] after:content-['']">Overview</a>
-                    <a href="#activity">Activity</a>
-                    <a href="#settings">Settings</a>
-                </nav>
-            </header>
 
             <section id="overview" className={`${wrap} flex items-end justify-between pt-[66px] pb-[42px] max-[850px]:flex-col max-[850px]:items-start max-[850px]:gap-6 max-[850px]:pt-[58px] max-[850px]:pb-[38px]`}>
                 <div>
@@ -63,7 +91,7 @@ export default function Page(){
                 </div>
             </section>
 
-            <section aria-label="Dashboard" className={`${wrap} grid! mx-auto max-w-[720px] grid-cols-1 justify-items-center gap-8`}>
+            <section aria-label="Dashboard" className={`${wrap} grid! mx-auto max-w-[960px] grid-cols-1 justify-items-center gap-8`}>
                 <Snowglobe>
                     <Sparkle className="top-[70px] right-7 text-[11px]"></Sparkle>
                     <Sparkle className="top-[132px] left-[30px] text-[8px]"></Sparkle>
@@ -88,7 +116,7 @@ export default function Page(){
                     </div>
                 </Snowglobe>
 
-                <div className="mx-auto grid w-full max-w-[720px] grid-cols-2 items-stretch gap-x-0 gap-y-[19px] max-[560px]:grid-cols-1">
+                <div className="mx-auto grid w-full max-w-[960px] grid-cols-2 items-stretch gap-x-0 gap-y-[19px] max-[560px]:grid-cols-1">
                     <article className={`${panel} h-full min-h-[295px] min-[561px]:rounded-r-none! min-[561px]:border-r-0`}>
                     <div className="flex items-start justify-between">
                         <div>
