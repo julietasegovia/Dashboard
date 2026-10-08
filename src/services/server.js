@@ -39,7 +39,7 @@ const route = (keyName, key, ttlMs, handler) => async (_req, res) => {
         try{
             res.json(await cached(keyName, ttlMs, handler))
         } catch (err) {
-            console.error(`[${keyName}]`, err.message)
+            console.error(`[${keyName}]`, err.message, err.cause?.code ?? err.cause?.message ?? '')
             res.status(502).json({error: 'Couldnt get suppliers data'})
         }
 }
@@ -113,6 +113,7 @@ app.get(
             minutes: Math.floor((total%3600)/60),
             deltaPct: prev ? Math.round(((total-prev)/ prev) * 100) : null,
             bars: week.map((d) => Math.round((d.seconds / max) * 100)),
+            days: week.map((d) => ({date: d.date, seconds: d.seconds})),
             labels : week.map((d) => new Date(`${d.date}T12:00:00`).toLocaleDateString('en-US', {weekday: 'narrow'}),),
         }
     }),
