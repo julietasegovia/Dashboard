@@ -1,3 +1,17 @@
+//placeholders
+const headlines = [
+    {category: 'ONE', title: 'news 1'},
+    {category: 'TWO', title: 'news 2'},
+    {category: 'THREE', title: 'news 3'},
+]
+
+const barHeights=[40,65,54,90,73,48,22]
+
+const wrap = 'relative z-10 mx-auto w-full w-max-[1220-x]'
+const panel = 'rounded-[14px] border border-[#c9e0f2] bg-white/70 p-[25px] shadow-[0_14px_34px_rgba(52,105,151,.09)]'
+const kicker = 'text-[10px] font-bold tracking-[.16em] text-[#6d91b4]'
+const heading = 'mt-[9px] text-[23px] font-semibold text-[#1d4e7c]'
+
 function Snowglobe({children, className=''}) {
     return (
         <div className={`relative min-h-[330px] overflow-hidden shadow-[0_14px_34px_rgba(52,105,151,.09)] max-[850px]:min-h[300px] ${className}`}>
@@ -9,8 +23,6 @@ function Snowglobe({children, className=''}) {
         </div>
     )
 }
-
-const wrap = 'relative z-[1] mx-auto w-full max-w-[1080px]'
 
 function Sparkle({className=''}){
     return(
