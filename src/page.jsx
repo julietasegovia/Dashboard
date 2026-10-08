@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import Particles, { ParticlesProvider } from "@tsparticles/react"
 import { loadSlim } from "@tsparticles/slim"
+import {useApi} from  './services/useApi.js'
 
 function initSnow(engine) {
     return loadSlim(engine)
@@ -83,7 +84,7 @@ export default function Page(){
             <div className="pointer-events-none absolute -right-[90px] top-[210px] size-[260px] rounded-full bg-[#c8e4ff] opacity-65 blur-[1px]"></div>
             <div className="pointer-events-none absolute -left-20 bottom-10 size-[180px] rounded-full bg-[#d9edff] opacity-80 blur-[1px]"></div>
 
-            <section id="overview" className={`${wrap} flex items-end justify-between pt-[66px] pb-[42px] max-[850px]:flex-col max-[850px]:items-start max-[850px]:gap-6 max-[850px]:pt-[58px] max-[850px]:pb-[38px]`}>
+            <section id="overview" className={`${wrap} flex items-center justify-center pt-[66px] pb-[42px] max-[850px]:flex-col max-[850px]:items-center max-[850px]:gap-6 max-[850px]:pt-[58px] max-[850px]:pb-[38px] items-center text-center`}>
                 <div>
                     <p className={kicker}> WEDNESDAY, OCTOBER 07, 2026 <span className="mx-[5px] text-[#4da2d7]">·</span> 10:40 AM</p>
                     <h1 className="mt-[17px] mb-3.5 text-[clamp(43px,5vw,68px)] leading-[.98] font-[650] tracking-[-.055em] text-[#174b7a] max-[560px]:text-[46px]">
