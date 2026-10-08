@@ -124,7 +124,7 @@ export default function Page(){
                     </div>
                     <div className="mt-[23px] flex flex-col">
                         {stories.map((h, i) => (
-                            <a key={h.title} href={h.url ?? `#story-${i + 1}`} target={h.url ? '_blank' : undefined} rel="noreferrer" className="group block border-[#dcebf6] py-3.5">
+                            <a key={h.title} href={h.url ?? `#story-${i + 1}`} target={h.url ? '_blank' : undefined} rel="noreferrer" className="group block border-t border-[#dcebf6] py-3.5">
                                 <strong className="line-clamp-2 block text-sm leading-[1.3] font-medium text-[#315f87] group-hover:text-[#7fb1d8]">
                                     {h.title}
                                 </strong>
