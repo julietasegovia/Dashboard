@@ -96,4 +96,10 @@ async function wakaRange(start, end){
 
 app.get(
     '/api/coding',
+    route('WAKATIME_API_KEY', WAKATIME_API_KEY, 15* 60_000, async () => {
+        const [week, prevWeek] = await Promise.all([
+            wakaRange(daysAgo(6), daysAgo(0)), wakaRange(daysAgo(13), daysAgo(7))
+        ])
+        const sum = (arr) => 
+    })
 )
