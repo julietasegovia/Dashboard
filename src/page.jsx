@@ -1,7 +1,8 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import Particles, { ParticlesProvider } from "@tsparticles/react"
 import { loadSlim } from "@tsparticles/slim"
 import {useApi} from  './services/useApi.js'
+import { useBattery, useGeo, useHackatimeKey } from "./lib/browser.js"
 
 async function initSnow(engine) {
     await loadSlim(engine)
@@ -34,7 +35,7 @@ function SnowParticles(){
     }, [])
 
     return (
-        <ParticlesProvider load={initSnow}>
+        <ParticlesProvider init={initSnow}>
             <Particles id="snowglobe-snow" options={options} className="pointer-events-none absolute inset-0 z-[1]"/>
         </ParticlesProvider>
     )
@@ -83,12 +84,31 @@ function Sparkle({className=''}){
     )
 }
 
-export default function Page(){
-    const weather = useApi('/api/weather', {refreshMs: 10 * 60_000}).data
-    const news = useApi('/api/news', {refreshMs: 15 * 60_000}).data
-    const coding = useApi('/api/coding', {refreshMs: 15 * 60_000}).data
-    const device = useApi('/api/device', {refreshMs: 30_000}).data
+function ConnectHackatime({onSave, invalid}) {
+    const [value, setValue] = useState('')
+    return (
+        <form onSubmit={(e) => {e.preventDefault(); if (value.trim()) onSave(value.trim())}} className="mt-6 flex flex-col gap-3">
+            <p className="text-xs leading-[1.6] text-[#5f8aaee]">{invalid ? 'That key was rejected. Paste a valid one.' : 'Connect your Hackatime account to see your coding time.'}</p>
+            <input type="password" autoComplete="off" value={value} onChange={(e) => setValue(e.target.value)} placeholder="Hackatime API Key" className="rounded-lg border border-[#c9e0f2] bg-white px-3 py-2 text-xs text-[#245e8e] outline-none focus:border-[#4d91c9]"/>
+            <button type="submit" className="cursor-pointer self-start rounded-lg bg-[#3b91cb] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#2f7fb7]">Connect</button>
+            <a href="https://hackatime.hackclub.com/my/wakatime_setup" target="_blank" rel="noreferrer" className="text-sm text-[#6d91b4] underline">Where do I find my API key?</a>
+        </form>
+    )
+}
 
+export default function Page(){
+    const geo = useGeo()
+    const weatherPath = geo.lat != null ? `/api/weather?lat=${geo.lat}&lon=${geo.lon}` : '/api/weather'
+    const weather = useApi(weatherPath, {refreshMs: 10 * 60_000, enabled: geo.status !== 'pending'}).data
+    const news = useApi('/api/news', {refreshMs: 15 * 60_000}).data
+    
+    const [hkKey, setHkKey] = useHackatimeKey()
+    const codingRes = useApi('/api/coding', {refreshMs: 15*60_000, enabled: !!hkKey, headers: {'x-hackatime-key': hkKey}})
+    const coding = codingRes.data
+    const needsKey = !hkKey || codingRes.error?.status === 401
+
+    const battery = useBattery()
+    const device = useApi('/api/device', { refreshMs: 15_000 }).data
     const stories = news?.headlines ?? headlines
     const bars = coding?.bars ?? barHeights
     const labels = coding?.labels ?? ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -118,13 +138,23 @@ export default function Page(){
                     </div>
                 </Snowglobe>
 
+                {weather?.tomorrow && (
+                    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-5 py-2.5 text-xs text-[#6e9abc]">
+                        <span className={kicker}>Tomorrow</span>
+                        <span>
+                            <b className="font-semibold text-[#3978a7]">{weather.tomorrow.high}°</b> / {weather.tomorrow.low}°
+                        </span>
+                        <span>{weather.tomorrow.description}</span>
+                        {weather.tomorrow.rain > 0 && <span>{weather.tomorrow.rain}% rain</span>}
+                    </div>
+                )}
+
                 <div className="mx-auto grid w-full max-w-[960px] grid-cols-2 items-stretch gap-x-1 gap-y-1 max-[560px]:grid-cols-1 mt-2">
                     <article className={`${panel} h-full min-h-[295px] min-[561px]:rounded-r-none! min-[561px]:border-r-0`}>
                     <div className="flex items-start justify-between">
                         <div>
                             <h2 className={heading}>What's going on?</h2>
                         </div>
-                        <button className="cursor-pointer tracking-[3px]  text-[#6b9ac0]" aria-label="More news">...</button>
                     </div>
                     <div className="mt-[23px] flex flex-col">
                         {stories.map((h, i) => (
@@ -146,7 +176,16 @@ export default function Page(){
                         <div>
                             <h2 className={heading}>Time you locked in</h2>
                         </div>
+                    {hkKey && (
+                            <button type="button" onClick={() => setHkKey('')} className="mt-[9px] cursor-pointer text-[10px] text-[#6b9ac0] hover:text-[#3b91cb]">
+                                Disconnect
+                            </button>
+                        )}
                     </div>
+                    {needsKey ? (
+                        <ConnectHackatime onSave={setHkKey} invalid={!!hkKey} />
+                    ) : (
+                    <>
                     <div className="mt-[29px] mb-[22px] flex items-baseline justify-between">
                         <strong className="text-[39px] font-semibold tracking-[-.04em] text-[#1c5888]">
                             {coding?.hours ?? '--'}<span className="text-[17px] text-[#6d9abe]">h</span> {coding?.minutes ?? '--'}<span className="text-[17px] text-[#6d9abe]">m</span>
@@ -178,6 +217,8 @@ export default function Page(){
                     <div className="mt-[9px] flex justify-between text-[10px] text-[#7e9fba]">
                         {labels.map((d, i) => <span key={i}>{d}</span>)}
                     </div>
+                    </>
+                    )}
                 </article>
 
                 <article className={`${panel} col-span-2 min-h-[170px] max-[560px]:col-span-1`}>

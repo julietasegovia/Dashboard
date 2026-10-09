@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import RootLayout from './layout.jsx'
 import Page from './page.jsx'
 

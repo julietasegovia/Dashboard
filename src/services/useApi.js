@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react"
 
-export function useApi(path, { refreshMs } = {}) {
+export function useApi(path, { refreshMs, enabled = true, headers } = {}) {
+    const headerKey = headers ? JSON.stringify(headers) : ''
     const [state, setState] = useState({ data: null, loading: true, error: null })
 
     useEffect(() => {
+        if (!enabled) return
         const ctrl = new AbortController()
         const load = () =>
-            fetch(path, { signal: ctrl.signal })
+            fetch(path, { signal: ctrl.signal, headers })
                 .then((r) => {
-                    if (!r.ok) throw new Error(`HTTP ${r.status}`)
+                    if (!r.ok) throw Object.assign(new Error(`HTTP ${r.status}`), { status: r.status })
                     return r.json()
                 })
                 .then((data) => setState({ data, loading: false, error: null }))
@@ -21,7 +23,7 @@ export function useApi(path, { refreshMs } = {}) {
             ctrl.abort()
             if (id) clearInterval(id)
         }
-    }, [path, refreshMs])
+    }, [path, refreshMs, enabled, headerKey])
 
     return state
 }
