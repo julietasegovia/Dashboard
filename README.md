@@ -10,7 +10,7 @@ This is a simple dashboard where Iput the stats I check the most, so that i didn
 - **Device**:  Battery is read from browser, I couldn't make it so that it can display cpuTemp without user running locally
 
 ## Structure
-I made it using React + Vite for frontend and pure JavaScript for backend, with the additional TailwindCSS framework for styling. I also used tspartciles to add the little snow effect detail on the weather's snowglobe.
+I made it using React + Vite for frontend and pure JavaScript for backend, with the additional TailwindCSS framework for styling. The snow in the weather globe is a small CSS animation.
 
 ## APIs
 

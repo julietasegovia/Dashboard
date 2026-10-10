@@ -1,43 +1,32 @@
 import { useMemo, useState } from "react"
-import Particles, { ParticlesProvider } from "@tsparticles/react"
-import { loadSlim } from "@tsparticles/slim"
 import {useApi} from  './services/useApi.js'
 import { useBattery, useGeo, useHackatimeKey } from "./lib/browser.js"
 
-async function initSnow(engine) {
-    await loadSlim(engine)
-}
-
 function SnowParticles(){
-    const options = useMemo(() => {
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        return {
-            fullScreen: {enable:false},
-            background: {color: {value: 'transparent'}},
-            fpsLimit: 60,
-            detectRetina: true,
-            particles: {
-                number:{value: 60, density: {enable: true, width: 400,height: 400}},
-                color: {value: '#ffffff'},
-                shape: {type: 'triangle'},
-                opacity: {value: {min: 0.45, max: 0.95}},
-                size: {value: {min: 1.5, max: 4.5}},
-                move: {
-                    enable: !reduceMotion,
-                    direction: 'bottom',
-                    speed: {min: 0.4, max: 1.4},
-                    straight: false,
-                    drift: {min: -0.6, max: 0.6},
-                    outModes: {default: 'out'},
-                },
-            },
-        }
-    }, [])
-
+    const flakes = useMemo(() => Array.from({ length: 36 }, () => ({
+        left: `${Math.random() * 100}%`,
+        delay: `${-Math.random() * 8}s`,
+        duration: `${5 + Math.random() * 6}s`,
+        size: `${2 + Math.random() * 3}px`,
+        opacity: 0.45 + Math.random() * 0.5,
+    })), [])
     return (
-        <ParticlesProvider init={initSnow}>
-            <Particles id="snowglobe-snow" options={options} className="pointer-events-none absolute inset-0 z-[1]"/>
-        </ParticlesProvider>
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1]">
+            {flakes.map((flake, i) => (
+                <span
+                    key={i}
+                    className="snow-flake absolute top-0 bg-white"
+                    style={{
+                        left: flake.left,
+                        width: flake.size,
+                        height: flake.size,
+                        opacity: flake.opacity,
+                        animationDelay: flake.delay,
+                        animationDuration: flake.duration,
+                    }}
+                />
+            ))}
+        </div>
     )
 }
 

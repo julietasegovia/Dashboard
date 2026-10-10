@@ -3,21 +3,18 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-     "scripts": {
-     "dev": "vite",
-     "build": "vite build",
-     "server": "node --watch --env-file=.env server/server.js",
-     "dev:all": "concurrently -n web,api \"npm:dev\" \"npm:server\"",
-     "start": "node server/server.js"
-   },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "server": "node --watch --env-file=.env server/server.js",
+    "dev:all": "concurrently -n web,api \"npm:dev\" \"npm:server\"",
+    "start": "node server/server.js"
+  },
   "engines": {
     "node": ">=20.6"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
-    "@tsparticles/engine": "^4.4.0",
-    "@tsparticles/react": "^4.4.0",
-    "@tsparticles/slim": "^4.4.0",
     "express": "^4.22.3",
     "express-rate-limit": "^8.7.1",
     "helmet": "^8.3.0",

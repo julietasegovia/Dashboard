@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+@keyframes snow-fall {
+  from { transform: translateY(-12px); }
+  to { transform: translateY(420px); }
+}
+
+.snow-flake {
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snow-flake { animation: none; }
+}

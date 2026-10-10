@@ -9,10 +9,8 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className="bg-[#edf5ff] font-sans text-[#173b63] antialiased">
-        {children}
-      </body>
-    </html>
+    <div className="min-h-screen bg-[#edf5ff] font-sans text-[#173b63] antialiased">
+      {children}
+    </div>
   )
 }
