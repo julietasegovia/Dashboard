@@ -88,27 +88,32 @@ function ConnectHackatime({onSave, invalid}) {
     const [value, setValue] = useState('')
     return (
         <form onSubmit={(e) => {e.preventDefault(); if (value.trim()) onSave(value.trim())}} className="mt-6 flex flex-col gap-3">
-            <p className="text-xs leading-[1.6] text-[#5f8aaee]">{invalid ? 'That key was rejected. Paste a valid one.' : 'Connect your Hackatime account to see your coding time.'}</p>
-            <input type="password" autoComplete="off" value={value} onChange={(e) => setValue(e.target.value)} placeholder="Hackatime API Key" className="rounded-lg border border-[#c9e0f2] bg-white px-3 py-2 text-xs text-[#245e8e] outline-none focus:border-[#4d91c9]"/>
+            <p className="text-xs leading-[1.6] text-[#5f8aae]">{invalid ? 'That key was rejected. Paste a valid one.' : 'Connect your Hackatime account to see your coding time.'}</p>
+            <input type="text" name="hackatime-api-key" autoComplete="off" autoCapitalize="off" spellCheck={false} value={value} onChange={(e) => setValue(e.target.value)} placeholder="Hackatime API Key" className="rounded-lg border border-[#c9e0f2] bg-white px-3 py-2 text-xs text-[#245e8e] outline-none focus:border-[#4d91c9]"/>
             <button type="submit" className="cursor-pointer self-start rounded-lg bg-[#3b91cb] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#2f7fb7]">Connect</button>
-            <a href="https://hackatime.hackclub.com/my/wakatime_setup" target="_blank" rel="noreferrer" className="text-sm text-[#6d91b4] underline">Where do I find my API key?</a>
+            <a href="https://hackatime.hackclub.com/setup?step=terminal-command" target="_blank" rel="noreferrer" className="text-sm text-[#6d91b4] underline">Where do I find my API key?</a>
+            <span className="text-sm text-[#6d91b4] mt-[-10px]">Select 'Windows' and paste the number after '-ApiKey' Here</span>
         </form>
     )
 }
 
 export default function Page(){
+    const config = useApi('/api/config').data
+    const personal = config?.personal === true
     const geo = useGeo()
     const weatherPath = geo.lat != null ? `/api/weather?lat=${geo.lat}&lon=${geo.lon}` : '/api/weather'
     const weather = useApi(weatherPath, {refreshMs: 10 * 60_000, enabled: geo.status !== 'pending'}).data
     const news = useApi('/api/news', {refreshMs: 15 * 60_000}).data
     
-    const [hkKey, setHkKey] = useHackatimeKey()
-    const codingRes = useApi('/api/coding', {refreshMs: 15*60_000, enabled: !!hkKey, headers: {'x-hackatime-key': hkKey}})
+    const [hkKey, setHkKey] = useHackatimeKey(personal)
+    const codingRes = useApi('/api/coding', {refreshMs: 15*60_000, headers: hkKey ? {'x-hackatime-key': hkKey} : undefined})
     const coding = codingRes.data
-    const needsKey = !hkKey || codingRes.error?.status === 401
+    const needsKey = codingRes.error?.status === 401
 
     const battery = useBattery()
-    const device = useApi('/api/device', { refreshMs: 15_000 }).data
+    const device = useApi('/api/device', { refreshMs: 15_000, enabled: personal }).data
+    const batteryPct = personal ? device?.battery : battery?.level
+    const showDevice = personal || battery != null
     const stories = news?.headlines ?? headlines
     const bars = coding?.bars ?? barHeights
     const labels = coding?.labels ?? ['M', 'T', 'W', 'T', 'F', 'S', 'S']
@@ -221,31 +226,35 @@ export default function Page(){
                     )}
                 </article>
 
+                {showDevice && (
                 <article className={`${panel} col-span-2 min-h-[170px] max-[560px]:col-span-1`}>
                     <div className="flex items-start justify-between">
                         <div>
                             <h2 className={heading}>Your device</h2>
                         </div>
                     </div>
-                    <div className="mt-[27px] grid grid-cols-2 gap-[30px] max-[560px]:grid-cols-1 max-[560px]:gap-5">
+                    <div className={`mt-[27px] grid ${personal ? 'grid-cols-2' : 'grid-cols-1'} gap-[30px] max-[560px]:grid-cols-1 max-[560px]:gap-5`}>
                         <div className="flex items-center gap-[15px]">
                             <div className="relative grid size-[43px] place-items-center rounded-[13px] bg-[#dff0fc] text-[22px] text-[#4b96c5] after:absolute after:top-[17px] after:-right-1 after:h-2.5 after:w-1 after:rounded-r-sm after:bg-[#9eb1a0] after:content-['']">
                                 <span className="relative h-3 w-[21px] rounded-sm border-2 border-[#8ba18d] after:absolute after:inset-y-0.5 after:right-1 after:left-0.5 after:bg-[#8ba18d] after:content-['']"></span>
                             </div>
                             <div>
                                 <small className="text-[9px] tracking-[.13em] text-[#6f96b5]">Battery</small>
-                                <strong className="my-1 block text-[28px] font-semibold text-[#245e8e]">{device?.battery ?? '--'}<span className="text-[17px] text-[#6d9abe]">%</span></strong>
+                                <strong className="my-1 block text-[28px] font-semibold text-[#245e8e]">{batteryPct ?? '--'}<span className="text-[17px] text-[#6d9abe]">%</span></strong>
                             </div>
                         </div>
+                        {personal && (
                         <div className="flex items-center gap-[15px]">
-                        <div className="grid size-[43px] place-items-center rounded-[13px] bg-[#dff0fc] text-[22px] text-[#4b96c5]">◒</div>
-                        <div>
-                            <small className="text-[9px] tracking-[.13em] text-[#6f96b5]">CPU temp</small>
-                            <strong className="my-1 block text-[28px] font-semibold text-[#245e8e]">{device?.cpuTemp ?? '--'}<span className="text-[17px] text-[#6d9abe]">°C</span></strong>
+                            <div className="grid size-[43px] place-items-center rounded-[13px] bg-[#dff0fc] text-[22px] text-[#4b96c5]">◒</div>
+                            <div>
+                                <small className="text-[9px] tracking-[.13em] text-[#6f96b5]">CPU temp</small>
+                                <strong className="my-1 block text-[28px] font-semibold text-[#245e8e]">{device?.cpuTemp ?? '--'}<span className="text-[17px] text-[#6d9abe]">°C</span></strong>
+                            </div>
                         </div>
-                        </div>
+                        )}
                     </div>
-                    </article>
+                </article>
+                )}
                 </div>
             </section>
         </main>

@@ -6,14 +6,20 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const KEY_FILE = path.join(__dirname, '.hackatime-key')
+
 const {
     PORT = 3001,
     OPENWEATHER_API_KEY,
-    WEATHER_CITY = 'Buenos Aires,AR',
+    WEATHER_CITY = 'Rosario,AR',
     NEWS_API_KEY,
     NEWS_COUNTRY = 'us',
     HACKATIME_URL = 'https://hackatime.hackclub.com',
+    PERSONAL_MODE = 'false',
 } = process.env
+
+const personal = PERSONAL_MODE === 'true'
 
 const app = express()
 app.set('trust proxy', 1)
@@ -134,10 +140,30 @@ app.get(
     }),
 )
 
-const hackatimeKey = (req) => {
-    const k = req.get('x-hackatime-key')?.trim()
-    return k && k.length <= 200 ? k : null
+const validKey = (k) => (typeof k === 'string' && k.trim() && k.trim().length <= 200 ? k.trim() : null)
+
+const readSavedKey = () => {
+    if (!personal) return null
+    try { return validKey(fs.readFileSync(KEY_FILE, 'utf8')) } catch { return null }
 }
+
+const hackatimeKey = (req) => validKey(req.get('x-hackatime-key')) ?? readSavedKey()
+
+if (personal) {
+    app.post('/api/hackatime-key', express.json({ limit: '1kb' }), (req, res) => {
+        const key = validKey(req.body?.key)
+        if (!key) return res.sendStatus(400)
+        fs.writeFileSync(KEY_FILE, key, { mode: 0o600 })
+        res.sendStatus(204)
+    })
+
+    app.delete('/api/hackatime-key', (_req, res) => {
+        fs.rmSync(KEY_FILE, { force: true })
+        res.sendStatus(204)
+    })
+}
+
+app.get('/api/config', (_req, res) => res.json({ personal }))
 const iso = (d) => d.toISOString().slice(0, 10)
 const daysAgo = (n) => new Date(Date.now() - n * 86_400_000)
 
@@ -184,7 +210,7 @@ function readText(file){
 function deviceStats() {
     let battery = null
     let supplies = []
-    try { supplies = fs.readdirSync('/sys/class/power_supply') } catch { /* no power supply */ }
+    try { supplies = fs.readdirSync('/sys/class/power_supply') } catch {}
     for (const name of supplies) {
         const base = `/sys/class/power_supply/${name}`
         if (readText(`${base}/type`) !== 'Battery') continue
@@ -194,7 +220,7 @@ function deviceStats() {
 
     let cpuTemp = null
     let hwmons = []
-    try { hwmons = fs.readdirSync('/sys/class/hwmon') } catch { /* no hwmon */ }
+    try { hwmons = fs.readdirSync('/sys/class/hwmon') } catch {}
     for (const name of hwmons) {
         const base = `/sys/class/hwmon/${name}`
         const chip = readText(`${base}/name`)
@@ -206,10 +232,10 @@ function deviceStats() {
     return { battery, cpuTemp }
 }
 
-app.get('/api/device', route('device', {ttl: 5_000}, () => deviceStats()))
+if (personal) app.get('/api/device', route('device', {ttl: 5_000}, () => deviceStats()))
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
-const dist = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'dist')
+const dist = path.join(__dirname, '..', 'dist')
 if (fs.existsSync(dist)) {
     app.use(express.static(dist))
     app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(path.join(dist, 'index.html')))
