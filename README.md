@@ -1,6 +1,8 @@
 # Snowboard
 This is a simple dashboard where Iput the stats I check the most, so that i didn't have to alt+tab constantly.
 
+![](readme-imgs/Screenshot%20From%202026-10-10%2014-31-24.png)
+
 ## Features
 - **Weather**: Snowboard asks for browser location to display your current weather and tomorrow's forecast
 - **News**: Top three headlines from NewsApi, you'll be redirected to the whole article by clicking on them

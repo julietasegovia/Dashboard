@@ -242,3 +242,14 @@ if (fs.existsSync(dist)) {
 }
 
 app.listen(PORT, () => console.log(`API ready on port ${PORT}`))
+
+if (!process.env.VERCEL) {
+    const dist = path.join(__dirname, '..', 'dist')
+    if (fs.existsSync(dist)) {
+        app.use(express.static(dist))
+        app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(path.join(dist, 'index.html')))
+    }
+    app.listen(PORT, () => console.log(`API ready on port ${PORT}`))
+}
+
+export default app
